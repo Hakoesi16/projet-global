@@ -12,6 +12,7 @@ class _BeginState extends State<Begin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.yellowAccent,
       appBar: AppBar(),
       body: Center(
         child: Column(
