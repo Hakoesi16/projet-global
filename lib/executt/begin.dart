@@ -1,48 +1,282 @@
 import 'package:flutter/material.dart';
-import 'package:send/executt/five.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class Begin extends StatefulWidget {
-  const Begin({super.key});
+import '../cubit/authcubit.dart';
+import '../cubit/authstate.dart';
+
+class ProfilePage extends StatefulWidget {
+  final String token;
+
+  const ProfilePage({super.key, required this.token});
 
   @override
-  State<Begin> createState() => _BeginState();
+  State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _BeginState extends State<Begin> {
+class _ProfilePageState extends State<ProfilePage> {
+  bool _notifications = true;
+  bool _darkMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // On récupère le profil au chargement
+    context.read<AuthCubit>().fetchProfile(widget.token);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.yellowAccent,
-      appBar: AppBar(),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, // Centrer le contenu verticalement
-          children: [
-            SizedBox(
-              width: 250,
-              height: 50,
-              child: MaterialButton(
-                color: const Color(0xFF013D73),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => Fivepage(email: "email")),
-                  );
-                },
-                child: const Text(
-                  "Log-in",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
+      backgroundColor: const Color(0xFFF5F7F9),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text("Profile", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        centerTitle: true,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+        ),
+      ),
+      body: BlocBuilder<AuthCubit, AuthState>(
+        builder: (context, state) {
+          if (state is AuthLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state is ProfileLoaded) {
+            final user = state.user;
+
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // --- HEADER CARD ---
+                  _buildHeaderCard(user),
+
+                  const SizedBox(height: 24),
+                  _buildSectionHeader("ACCOUNT INFO"),
+                  const SizedBox(height: 8),
+                  _buildAccountInfoCard(user),
+
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildSectionHeader("DOCUMENTS"),
+                      TextButton.icon(
+                        onPressed: () {},
+                        icon: const Icon(Icons.upload_file, size: 18),
+                        label: const Text("Upload New"),
+                      )
+                    ],
                   ),
+                  _buildDocumentsCard(user),
+
+                  const SizedBox(height: 24),
+                  _buildSectionHeader("SETTINGS"),
+                  const SizedBox(height: 8),
+                  _buildSettingsCard(),
+
+                  const SizedBox(height: 100), // Espace pour la barre
+                ],
+              ),
+            );
+          }
+
+          if (state is ProfileError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                    const SizedBox(height: 16),
+                    Text(state.message, textAlign: TextAlign.center),
+                    ElevatedButton(
+                      onPressed: () => context.read<AuthCubit>().fetchProfile(widget.token),
+                      child: const Text("Retry"),
+                    )
+                  ],
                 ),
               ),
-            ),
-          ],
-        ),
+            );
+          }
+
+          return const Center(child: Text("No Profile Data"));
+        },
+      ),
+      bottomNavigationBar: _buildBottomNavBar(),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Text(
+      title,
+      style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 13),
+    );
+  }
+
+  Widget _buildHeaderCard(Map<String, dynamic> user) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
+      ),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 50,
+            backgroundColor: const Color(0xFFE3F2FD),
+            backgroundImage: user["profilePicture"] != null ? NetworkImage(user["profilePicture"]) : null,
+            child: user["profilePicture"] == null ? const Icon(Icons.person, size: 60, color: Color(0xFF013D73)) : null,
+          ),
+          const SizedBox(height: 12),
+          Text(user["name"] ?? "Unknown", style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+          Text("ID: ${user["id"] ?? "N/A"} | LICENSE: ${user["license"] ?? "N/A"}", style: const TextStyle(color: Colors.grey)),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {},
+                icon: const Icon(Icons.edit, size: 18, color: Colors.white),
+                label: const Text("Edit Profile", style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF013D73),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300), borderRadius: BorderRadius.circular(10)),
+                child: IconButton(onPressed: () {}, icon: const Icon(Icons.share, color: Colors.grey)),
+              )
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAccountInfoCard(Map<String, dynamic> user) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
+      child: Column(
+        children: [
+          _infoTile(Icons.directions_boat, "Boat Name", user["boatName"] ?? "N/A", trailing: _statusBadge()),
+          const Divider(),
+          Row(
+            children: [
+              Expanded(child: _infoTile(null, "Registration", user["registration"] ?? "N/A")),
+              Container(width: 1, height: 40, color: Colors.grey.shade200),
+              Expanded(child: _infoTile(null, "Home Port", user["homePort"] ?? "N/A")),
+            ],
+          ),
+          const Divider(),
+          _infoTile(Icons.email_outlined, "Email Address", user["email"] ?? "N/A"),
+          const Divider(),
+          _infoTile(Icons.calendar_today_outlined, "License Expiry", user["licenseExpiry"] ?? "N/A"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDocumentsCard(Map<String, dynamic> user) {
+    return Container(
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
+      child: Column(
+        children: [
+          _docTile(Icons.description, "Fishing License", "Valid until ${user["licenseExpiry"] ?? "N/A"}"),
+          const Divider(height: 1),
+          _docTile(Icons.directions_boat, "Boat Registration", "Verified on ${user["registration day"] ?? "N/A"}"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingsCard() {
+    return Container(
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
+      child: Column(
+        children: [
+          _settingsTile(Icons.lock_outline, "Change Password", trailing: const Icon(Icons.chevron_right, color: Colors.grey)),
+          const Divider(height: 1),
+          _settingsTile(Icons.language, "Language", trailing: const Text("English >", style: TextStyle(color: Colors.grey))),
+          const Divider(height: 1),
+          _settingsTile(Icons.notifications_none, "Notifications",
+              trailing: Switch(value: _notifications, activeThumbColor: const Color(0xFF013D73), onChanged: (v) => setState(() => _notifications = v))),
+          const Divider(height: 1),
+          _settingsTile(Icons.dark_mode_outlined, "Dark Mode",
+              trailing: Switch(value: _darkMode, activeThumbColor: const Color(0xFF013D73), onChanged: (v) => setState(() => _darkMode = v))),
+        ],
+      ),
+    );
+  }
+
+  Widget _infoTile(IconData? icon, String label, String value, {Widget? trailing}) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: icon != null ? Icon(icon, color: const Color(0xFF013D73)) : null,
+      title: Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+      subtitle: Text(value, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+      trailing: trailing,
+    );
+  }
+
+  Widget _statusBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(5)),
+      child: const Text("ACTIVE", style: TextStyle(color: Colors.green, fontSize: 10, fontWeight: FontWeight.bold)),
+    );
+  }
+
+  Widget _docTile(IconData icon, String title, String sub) {
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(color: const Color(0xFFE3F2FD), borderRadius: BorderRadius.circular(8)),
+        child: Icon(icon, color: const Color(0xFF013D73)),
+      ),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+      subtitle: Text(sub, style: const TextStyle(fontSize: 12)),
+      trailing: const Icon(Icons.check_circle, color: Colors.green),
+    );
+  }
+
+  Widget _settingsTile(IconData icon, String title, {required Widget trailing}) {
+    return ListTile(
+      leading: Icon(icon, color: const Color(0xFF013D73)),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
+      trailing: trailing,
+    );
+  }
+
+  Widget _buildBottomNavBar() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+      height: 70,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(35),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 20, offset: const Offset(0, 5))],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          IconButton(onPressed: () {}, icon: const Icon(Icons.home_outlined, color: Colors.grey)),
+          IconButton(onPressed: () {}, icon: const Icon(Icons.anchor, color: Colors.grey)),
+          IconButton(onPressed: () {}, icon: const Icon(Icons.shopping_basket_outlined, color: Colors.grey)),
+          IconButton(onPressed: () {}, icon: const Icon(Icons.remove_red_eye_outlined, color: Colors.grey)),
+          IconButton(onPressed: () {}, icon: const Icon(Icons.person, color: Color(0xFF013D73), size: 30)),
+        ],
       ),
     );
   }

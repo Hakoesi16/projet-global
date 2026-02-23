@@ -1,30 +1,48 @@
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:meta/meta.dart';
 
-@immutable
-abstract class AuthState {}
+
+import 'package:equatable/equatable.dart';
+
+abstract class AuthState extends Equatable {
+  @override
+  List<Object?> get props => [];
+}
 
 class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
-class AuthSuccess extends AuthState {
-  final GoogleSignInAccount user;
-  AuthSuccess(this.user);
+class AuthAuthenticated extends AuthState {
+  final Map<String, dynamic> userData;
+  AuthAuthenticated(this.userData);
+
+  @override
+  List<Object?> get props => [userData];
 }
 
 class AuthError extends AuthState {
   final String message;
   AuthError(this.message);
-}
 
-class AuthSuccessFacebook extends AuthState {
-  final Map<String, dynamic> userData;
-  AuthSuccessFacebook(this.userData);
+  @override
+  List<Object?> get props => [message];
 }
 
 class EmailSentSuccess extends AuthState {}
 
 class CodeVerifiedSuccess extends AuthState {}
 
-class PasswordSentSuccess extends AuthState {}
+class ProfileLoaded extends AuthState {
+  final Map<String, dynamic> user;
+  ProfileLoaded(this.user);
+
+  @override
+  List<Object?> get props => [user];
+}
+
+class ProfileError extends AuthState {
+  final String message;
+  ProfileError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
