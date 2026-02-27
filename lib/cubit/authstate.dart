@@ -46,3 +46,4 @@ class ProfileError extends AuthState {
   @override
   List<Object?> get props => [message];
 }
+class ProfileUpdatedSuccess extends AuthState {}

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../cubit/authcubit.dart';
 import '../cubit/authstate.dart';
+import 'editeprofile.dart';
 
 class ProfilePage extends StatefulWidget {
   final String token;
@@ -144,7 +145,9 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfilePage(token: widget.token)));
+                },
                 icon: const Icon(Icons.edit, size: 18, color: Colors.white),
                 label: const Text("Edit Profile", style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(

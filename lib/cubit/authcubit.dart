@@ -192,4 +192,37 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthError(e.toString()));
     }
   }
+  Future<void> updateProfile({
+    required String token,
+    required String name,
+    required String phone,
+    required String homePort,
+    required String boatName,
+  }) async {
+    try {
+      emit(AuthLoading());
+
+      final response = await http.put(
+        Uri.parse("https://yourbackend.com/api/profile"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          "name": name,
+          "phone": phone,
+          "homePort": homePort,
+          "boatName": boatName,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        emit(ProfileUpdatedSuccess());
+      } else {
+        emit(ProfileError("Update failed"));
+      }
+    } catch (e) {
+      emit(ProfileError(e.toString()));
+    }
+  }
 }
