@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../cubit/authcubit.dart';
 import '../cubit/authstate.dart';
@@ -20,6 +22,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final TextEditingController _homePortController = TextEditingController();
   final TextEditingController _boatNameController = TextEditingController();
 
+  File? _imageFile;
+  final ImagePicker _picker = ImagePicker();
+
   @override
   void initState() {
     super.initState();
@@ -36,6 +41,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.dispose();
   }
 
+  Future<void> _pickImage() async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1000,
+        maxHeight: 1000,
+        imageQuality: 85,
+      );
+      if (pickedFile != null) {
+        setState(() {
+          _imageFile = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      debugPrint("Error picking image: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +68,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         elevation: 0,
         title: const Text(
           "Edit Profile",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Color(0xFF011A33), fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -62,14 +85,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
             _homePortController.text = state.user["homePort"] ?? "";
             _boatNameController.text = state.user["boatName"] ?? "";
           }
-
           if (state is ProfileUpdatedSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("Profile updated successfully")),
             );
             Navigator.pop(context);
           }
-
           if (state is ProfileError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
@@ -82,13 +103,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
           }
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             child: Column(
               children: [
                 _buildProfileImage(),
                 const SizedBox(height: 24),
                 _buildPersonalInfoCard(),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 _buildVesselCard(),
                 const SizedBox(height: 24),
                 _buildDeactivateButton(),
@@ -109,32 +130,44 @@ class _EditProfilePageState extends State<EditProfilePage> {
       children: [
         Stack(
           children: [
-            const CircleAvatar(
-              radius: 55,
-              backgroundColor: Color(0xFFE3F2FD),
-              child: Icon(Icons.person, size: 60, color: Color(0xFF013D73)),
+            GestureDetector(
+              onTap: _pickImage,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                child: CircleAvatar(
+                  radius: 65,
+                  backgroundColor: const Color(0xFFE3F2FD),
+                  backgroundImage: _imageFile != null
+                      ? FileImage(_imageFile!)
+                      : const NetworkImage('https://via.placeholder.com/150') as ImageProvider,
+                ),
+              ),
             ),
             Positioned(
-              bottom: 0,
-              right: 0,
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFF013D73),
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
+              bottom: 5,
+              right: 5,
+              child: GestureDetector(
+                onTap: _pickImage,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF013D73),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.camera_alt, color: Colors.white, size: 18),
                 ),
               ),
             )
           ],
         ),
-        const SizedBox(height: 8),
-        const Text(
-          "Change Profile Photo",
-          style: TextStyle(
-              color: Color(0xFF044079), fontWeight: FontWeight.w600),
+        const SizedBox(height: 12),
+        GestureDetector(
+          onTap: _pickImage,
+          child: const Text(
+            "Change Profile Photo",
+            style: TextStyle(color: Color(0xFF013D73), fontWeight: FontWeight.bold, fontSize: 14),
+          ),
         )
       ],
     );
@@ -148,11 +181,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
         const SizedBox(height: 16),
         _buildTextField("Phone Number", _phoneController),
         const SizedBox(height: 16),
-        _buildTextField("Email Address", _emailController, enabled: false),
+        _buildTextField(
+          "Email Address", 
+          _emailController, 
+          enabled: false, 
+          suffixIcon: Icons.lock_outline,
+        ),
         const SizedBox(height: 8),
         const Text(
           "Email address is verified and cannot be changed.",
-          style: TextStyle(color: Colors.grey, fontSize: 12),
+          style: TextStyle(color: Color(0xFFAAB8C2), fontSize: 11),
         ),
       ],
     );
@@ -162,21 +200,26 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return _cardContainer(
       title: "VESSEL & HOME PORT",
       children: [
-        _buildTextField("Home Port", _homePortController),
+        _buildTextField("Home Port", _homePortController, prefixIcon: Icons.location_on_outlined),
         const SizedBox(height: 16),
-        _buildTextField("Boat Name", _boatNameController),
+        _buildTextField("Boat Name", _boatNameController, prefixIcon: Icons.directions_boat_outlined),
       ],
     );
   }
 
   Widget _buildDeactivateButton() {
-    return TextButton.icon(
-      onPressed: () {},
-      icon: const Icon(Icons.delete_outline, color: Colors.red),
-      label: const Text(
-        "Deactivate Account",
-        style: TextStyle(color: Colors.red),
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(Icons.delete_outline, color: Color(0xFFFF5252), size: 20),
+        TextButton(
+          onPressed: () {},
+          child: const Text(
+            "Deactivate Account",
+            style: TextStyle(color: Color(0xFFFF5252), fontWeight: FontWeight.w600),
+          ),
+        ),
+      ],
     );
   }
 
@@ -193,14 +236,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF013D73),
-        minimumSize: const Size(double.infinity, 55),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        minimumSize: const Size(double.infinity, 56),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 2,
       ),
-      child: const Text(
-        "Save Changes",
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.check_circle_outline, color: Colors.white),
+          SizedBox(width: 8),
+          Text(
+            "Save Changes",
+            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
     );
   }
@@ -210,83 +259,67 @@ class _EditProfilePageState extends State<EditProfilePage> {
       onPressed: () => Navigator.pop(context),
       child: const Text(
         "Cancel",
-        style: TextStyle(color: Colors.grey),
+        style: TextStyle(color: Color(0xFF7B8D9E), fontWeight: FontWeight.bold, fontSize: 16),
       ),
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller,
-      {bool enabled = true}) {
+  Widget _buildTextField(String label, TextEditingController controller, {bool enabled = true, IconData? prefixIcon, IconData? suffixIcon}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label),
-        const SizedBox(height: 6),
+        Text(label, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4A5568), fontSize: 13)),
+        const SizedBox(height: 8),
         TextField(
           controller: controller,
           enabled: enabled,
+          style: TextStyle(color: enabled ? Colors.black : const Color(0xFF7B8D9E)),
           decoration: InputDecoration(
+            prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: const Color(0xFF013D73)) : null,
+            suffixIcon: suffixIcon != null ? Icon(suffixIcon, color: const Color(0xFFBDC8D1), size: 18) : null,
             filled: true,
-            fillColor: const Color(0xFFF5F7F9),
+            fillColor: enabled ? Colors.white : const Color(0xFFF8FAFB),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
             ),
           ),
         ),
       ],
     );
   }
-  Widget _cardContainer({
-    required String title,
-    required List<Widget> children,
-    Color titleColor = Colors.grey, // 👈 ajout paramètre couleur
-  }) {
+
+  Widget _cardContainer({required String title, required List<Widget> children}) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: titleColor, // 👈 utilise la couleur ici
-            ),
+            style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF718096), fontSize: 14, letterSpacing: 0.5),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           ...children,
         ],
       ),
     );
   }
-//   Widget _cardContainer(
-//       {required String title, required List<Widget> children}) {
-//     return Container(
-//       width: double.infinity,
-//       padding: const EdgeInsets.all(16),
-//       decoration: BoxDecoration(
-//         color: Colors.white,
-//         borderRadius: BorderRadius.circular(16),
-//       ),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Text(
-//             title,
-//             style: const TextStyle(
-//               fontWeight: FontWeight.w600,
-//               color: Colors.grey,
-//             ),
-//           ),
-//           const SizedBox(height: 16),
-//           ...children,
-//         ],
-//       ),
-//     );
-//   }
- }
+}

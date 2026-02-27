@@ -1,5 +1,3 @@
-
-
 import 'package:equatable/equatable.dart';
 
 abstract class AuthState extends Equatable {
@@ -39,6 +37,8 @@ class ProfileLoaded extends AuthState {
   List<Object?> get props => [user];
 }
 
+class ProfileUpdatedSuccess extends AuthState {} // État ajouté ici
+
 class ProfileError extends AuthState {
   final String message;
   ProfileError(this.message);
@@ -46,4 +46,3 @@ class ProfileError extends AuthState {
   @override
   List<Object?> get props => [message];
 }
-class ProfileUpdatedSuccess extends AuthState {}
