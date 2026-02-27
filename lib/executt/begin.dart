@@ -115,7 +115,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 13),
+      style: const TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.w700, fontSize: 13),
     );
   }
 
@@ -138,7 +138,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(height: 12),
           Text(user["name"] ?? "Unknown", style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-          Text("ID: ${user["id"] ?? "N/A"} | LICENSE: ${user["license"] ?? "N/A"}", style: const TextStyle(color: Colors.grey)),
+          Text("ID: ${user["id"] ?? "N/A"} | LICENSE: ${user["license"] ?? "N/A"}", style: const TextStyle(color: Color(0xFF64748B),fontWeight: FontWeight.w600)),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -175,7 +175,8 @@ class _ProfilePageState extends State<ProfilePage> {
           Row(
             children: [
               Expanded(child: _infoTile(null, "Registration", user["registration"] ?? "N/A")),
-              Container(width: 1, height: 40, color: Colors.grey.shade200),
+              Container(width: 1, height: 40, color: Colors.grey.shade400),
+              Container(width: 7, height: 40),
               Expanded(child: _infoTile(null, "Home Port", user["homePort"] ?? "N/A")),
             ],
           ),
@@ -207,12 +208,12 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Column(
         children: [
           _settingsTile(Icons.lock_outline, "Change Password", trailing: const Icon(Icons.chevron_right, color: Colors.grey)),
-          const Divider(height: 1),
+          const Divider(),
           _settingsTile(Icons.language, "Language", trailing: const Text("English >", style: TextStyle(color: Colors.grey))),
-          const Divider(height: 1),
+          const Divider(),
           _settingsTile(Icons.notifications_none, "Notifications",
               trailing: Switch(value: _notifications, activeThumbColor: const Color(0xFF013D73), onChanged: (v) => setState(() => _notifications = v))),
-          const Divider(height: 1),
+          const Divider(),
           _settingsTile(Icons.dark_mode_outlined, "Dark Mode",
               trailing: Switch(value: _darkMode, activeThumbColor: const Color(0xFF013D73), onChanged: (v) => setState(() => _darkMode = v))),
         ],
@@ -224,8 +225,8 @@ class _ProfilePageState extends State<ProfilePage> {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: icon != null ? Icon(icon, color: const Color(0xFF013D73)) : null,
-      title: Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-      subtitle: Text(value, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+      title: Text(label, style: const TextStyle(color: Color(0xFF64748B), fontSize: 12,fontWeight: FontWeight.w400)),
+      subtitle: Text(value, style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF0F172A))),
       trailing: trailing,
     );
   }

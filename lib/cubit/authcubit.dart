@@ -113,28 +113,37 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   // --- PROFIL ---
+  // Future<void> fetchProfile(String token) async {
+  //   try {
+  //     emit(AuthLoading());
+  //     final response = await http.get(
+  //       Uri.parse("$_baseUrl/api/profile"), // Using base URL
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "Authorization": "Bearer $token",
+  //       },
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       final data = jsonDecode(response.body);
+  //       emit(ProfileLoaded(data));
+  //     } else {
+  //       emit(ProfileError("Failed to load profile"));
+  //     }
+  //   } catch (e) {
+  //     emit(ProfileError(e.toString()));
+  //   }
+  // }
   Future<void> fetchProfile(String token) async {
-    try {
-      emit(AuthLoading());
-      final response = await http.get(
-        Uri.parse("$_baseUrl/api/profile"), // Using base URL
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        emit(ProfileLoaded(data));
-      } else {
-        emit(ProfileError("Failed to load profile"));
-      }
-    } catch (e) {
-      emit(ProfileError(e.toString()));
-    }
+    emit(ProfileLoaded({
+      "name": "Captain Test",
+      "email": "test@mail.com",
+      "boatName": "Sea Explorer",
+      "registration": "MAR-9999",
+      "homePort": "Oran",
+      "licenseExpiry": "2026",
+    }));
   }
-
   // --- LOGOUT ---
   Future<void> logout() async {
     // 3. Added try-catch for robustness
