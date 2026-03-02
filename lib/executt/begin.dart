@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/authcubit.dart';
 import '../cubit/authstate.dart';
 import 'editeprofile.dart';
+import 'homepage.dart';
 
 class ProfilePage extends StatefulWidget {
   final String token;
@@ -275,7 +276,9 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.home_outlined, color: Colors.grey)),
+          IconButton(onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage(token: widget.token)));
+          }, icon: const Icon(Icons.home_outlined, color: Colors.grey)),
           IconButton(onPressed: () {}, icon: const Icon(Icons.anchor, color: Colors.grey)),
           IconButton(onPressed: () {}, icon: const Icon(Icons.shopping_basket_outlined, color: Colors.grey)),
           IconButton(onPressed: () {}, icon: const Icon(Icons.remove_red_eye_outlined, color: Colors.grey)),

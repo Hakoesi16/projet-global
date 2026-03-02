@@ -8,7 +8,6 @@ import 'authstate.dart';
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(AuthInitial());
 
-  // 1. Centralized base URL for all API calls
   final String _baseUrl = "https://yourbackend.com";
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
@@ -25,7 +24,7 @@ class AuthCubit extends Cubit<AuthState> {
 
       final googleAuth = await googleUser.authentication;
       final response = await http.post(
-        Uri.parse("$_baseUrl/google-login"), // Using base URL
+        Uri.parse("https://backend.com"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"idToken": googleAuth.idToken}),
       );
@@ -53,7 +52,7 @@ class AuthCubit extends Cubit<AuthState> {
       }
 
       final response = await http.post(
-        Uri.parse("$_baseUrl/facebook-login"), // Using base URL
+        Uri.parse("https://backend.com"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"accessToken": result.accessToken!.token}),
       );
@@ -74,7 +73,7 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       emit(AuthLoading());
       final response = await http.post(
-        Uri.parse("$_baseUrl/api/login"), // Using base URL
+        Uri.parse("https://backend.com"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"email": email, "password": password}),
       );
@@ -95,14 +94,13 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       emit(AuthLoading());
       final response = await http.post(
-        Uri.parse("$_baseUrl/api/register"), // Using base URL
+        Uri.parse("https://backend.com"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"email": email, "password": password}),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final userData = jsonDecode(response.body);
-        // 2. Uniform state for authentication success
         emit(AuthAuthenticated(userData));
       } else {
         emit(AuthError("Registration failed: ${response.statusCode}"));
@@ -113,85 +111,49 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   // --- PROFIL ---
-  // Future<void> fetchProfile(String token) async {
-  //   try {
-  //     emit(AuthLoading());
-  //     final response = await http.get(
-  //       Uri.parse("$_baseUrl/api/profile"), // Using base URL
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         "Authorization": "Bearer $token",
-  //       },
-  //     );
-  //
-  //     if (response.statusCode == 200) {
-  //       final data = jsonDecode(response.body);
-  //       emit(ProfileLoaded(data));
-  //     } else {
-  //       emit(ProfileError("Failed to load profile"));
-  //     }
-  //   } catch (e) {
-  //     emit(ProfileError(e.toString()));
-  //   }
-  // }
   Future<void> fetchProfile(String token) async {
+    // For testing purposes, emitting dummy data
     emit(ProfileLoaded({
-      "name": "Captain Test",
-      "email": "test@mail.com",
+      "name": "Captain Hako",
+      "email": "hako@gmail.com",
       "boatName": "Sea Explorer",
       "registration": "MAR-9999",
       "homePort": "Oran",
       "licenseExpiry": "2026",
     }));
   }
-  // --- LOGOUT ---
-  Future<void> logout() async {
-    // 3. Added try-catch for robustness
-    try {
-      await _googleSignIn.signOut();
-      await FacebookAuth.instance.logOut();
-      emit(AuthInitial());
-    } catch (e) {
-      emit(AuthError("Logout failed: ${e.toString()}"));
-    }
-  }
 
-  // --- EMAIL & CODE ---
-  Future<void> sendEmail(String email) async {
+  // --- HOME DATA ---
+  Future<void> fetchHomeData(String token) async {
     try {
       emit(AuthLoading());
-      final response = await http.post(
-        Uri.parse("$_baseUrl/api/send-email"), // Using base URL
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email}),
-      );
-      if (response.statusCode == 200) {
-        emit(EmailSentSuccess());
-      } else {
-        emit(AuthError("Server error: ${response.statusCode}"));
-      }
+      // Simulation d'un appel API
+      await Future.delayed(const Duration(seconds: 1));
+      
+      emit(HomeDataLoaded({
+        "userName": "Capt. Hako",
+        "earnings": "12,450.00 DA",
+        "earningsTrend": "8.4%",
+        "weight": "4,250 kg",
+        "weightTrend": "5.2%",
+        "pendingBatches": 24,
+        "approvedBatches": 85,
+        "rejectedBatches": 12,
+        "expiredBatches": 7,
+        "marketItem": {
+          "name": "Sardine",
+          "grade": "Premium Grade",
+          "demand": "Rising Demand",
+          "price": "320.50 DA / kg",
+          "tag": "High Demand"
+        }
+      }));
     } catch (e) {
       emit(AuthError(e.toString()));
     }
   }
 
-  Future<void> verifyCode(String email, String code) async {
-    try {
-      emit(AuthLoading());
-      final response = await http.post(
-        Uri.parse("$_baseUrl/api/verify-code"), // Using base URL
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email, "code": code}),
-      );
-      if (response.statusCode == 200) {
-        emit(CodeVerifiedSuccess());
-      } else {
-        emit(AuthError("Invalid code"));
-      }
-    } catch (e) {
-      emit(AuthError(e.toString()));
-    }
-  }
+  // --- UPDATE PROFIL ---
   Future<void> updateProfile({
     required String token,
     required String name,
@@ -201,9 +163,8 @@ class AuthCubit extends Cubit<AuthState> {
   }) async {
     try {
       emit(AuthLoading());
-
       final response = await http.put(
-        Uri.parse("https://yourbackend.com/api/profile"),
+        Uri.parse("https://backend.com"),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
@@ -223,6 +184,54 @@ class AuthCubit extends Cubit<AuthState> {
       }
     } catch (e) {
       emit(ProfileError(e.toString()));
+    }
+  }
+
+  // --- LOGOUT ---
+  Future<void> logout() async {
+    try {
+      await _googleSignIn.signOut();
+      await FacebookAuth.instance.logOut();
+      emit(AuthInitial());
+    } catch (e) {
+      emit(AuthError("Logout failed: ${e.toString()}"));
+    }
+  }
+
+  // --- EMAIL & CODE ---
+  Future<void> sendEmail(String email) async {
+    try {
+      emit(AuthLoading());
+      final response = await http.post(
+        Uri.parse("https://backend.com"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"email": email}),
+      );
+      if (response.statusCode == 200) {
+        emit(EmailSentSuccess());
+      } else {
+        emit(AuthError("Server error: ${response.statusCode}"));
+      }
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  Future<void> verifyCode(String email, String code) async {
+    try {
+      emit(AuthLoading());
+      final response = await http.post(
+        Uri.parse("https://backend.com"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"email": email, "code": code}),
+      );
+      if (response.statusCode == 200) {
+        emit(CodeVerifiedSuccess());
+      } else {
+        emit(AuthError("Invalid code"));
+      }
+    } catch (e) {
+      emit(AuthError(e.toString()));
     }
   }
 }

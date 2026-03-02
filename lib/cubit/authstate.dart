@@ -37,7 +37,15 @@ class ProfileLoaded extends AuthState {
   List<Object?> get props => [user];
 }
 
-class ProfileUpdatedSuccess extends AuthState {} // État ajouté ici
+class HomeDataLoaded extends AuthState {
+  final Map<String, dynamic> data;
+  HomeDataLoaded(this.data);
+
+  @override
+  List<Object?> get props => [data];
+}
+
+class ProfileUpdatedSuccess extends AuthState {}
 
 class ProfileError extends AuthState {
   final String message;
