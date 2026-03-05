@@ -76,11 +76,12 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildHeader(String name) {
     return Container(
-      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius:1)],),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -121,37 +122,44 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildAddBatchCard() {
-    return MaterialButton(onPressed: (){
-      // Navigator.push(context, MaterialPageRoute(builder: (context) {
-      //   return const AddBatchPage();
-    },child: Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF013D73),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: const Color(0xFF013D73).withValues(alpha: 0.3), blurRadius: 15, offset: const Offset(0, 8))],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
-            child: const Icon(Icons.add_box_outlined, color: Colors.white, size: 28),
-          ),
-          const SizedBox(width: 16),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Add New Batch", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                Text("Log your latest catch", style: TextStyle(color: Colors.white70, fontSize: 13)),
-              ],
+    return GestureDetector(
+      onTap: () {
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => const BatchPage(),
+        //   ),
+        // );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF013D73),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: const Color(0xFF013D73).withValues(alpha: 0.3), blurRadius: 15, offset: const Offset(0, 8))],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
+              child: const Icon(Icons.add_box_outlined, color: Colors.white, size: 28),
             ),
-          ),
-          const Icon(Icons.chevron_right, color: Colors.white),
-        ],
+            const SizedBox(width: 16),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Add New Batch", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text("Log your latest catch", style: TextStyle(color: Colors.white70, fontSize: 13)),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: Colors.white),
+          ],
+        ),
       ),
-    ),);
+    );
   }
 
   Widget _buildQuickActions() {
@@ -159,11 +167,19 @@ class _HomePageState extends State<HomePage> {
       children: [
         Expanded(child: _buildActionItem(Icons.anchor, "Register Arrival")),
         const SizedBox(width: 16),
-        Expanded(child:MaterialButton(onPressed: (){
-          // Navigator.push(context, MaterialPageRoute(builder: (context) {
-          //   return const MyBatchesPage();
-          // },),);
-        },child: _buildActionItem(Icons.list_alt, "My Batches"),)),
+        Expanded(
+          child: InkWell(
+            onTap: () {
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => const MyBatchesPage(),
+              //   ),
+              // );
+            },
+            child: _buildActionItem(Icons.list_alt, "My Batches"),
+          ),
+        )
       ],
     );
   }
@@ -270,15 +286,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildMarketCard(Map<String, dynamic> item) {
-    return MaterialButton(onPressed: (){
-      // Navigator.push(context, MaterialPageRoute(builder: (context) {
-      //   return const MarketPage();
-    },child: Container(
+    return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
       child: Row(
         children: [
           ClipRRect(
@@ -301,36 +311,16 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  item["name"],
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  "${item["grade"]} - ${item["demand"]}",
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
-                  overflow: TextOverflow.ellipsis,
-                ),
+                Text(item["name"], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16), overflow: TextOverflow.ellipsis),
+                Text("${item["grade"]} - ${item["demand"]}", style: const TextStyle(color: Colors.grey, fontSize: 12), overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Expanded(
-                      child: Text(
-                        item["price"],
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF013D73)),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
+                    Expanded(child: Text(item["price"], style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF013D73)), overflow: TextOverflow.ellipsis)),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE8F5E9),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        item["tag"],
-                        style: const TextStyle(color: Color(0xFF2E7D32), fontSize: 10, fontWeight: FontWeight.bold),
-                      ),
+                      decoration: BoxDecoration(color: const Color(0xFFE8F5E9), borderRadius: BorderRadius.circular(6)),
+                      child: Text(item["tag"], style: const TextStyle(color: Color(0xFF2E7D32), fontSize: 10, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -339,7 +329,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-    ),);
+    );
   }
 
   Widget _buildBottomNavBar() {
@@ -358,9 +348,33 @@ class _HomePageState extends State<HomePage> {
             onTap: () => context.read<AuthCubit>().fetchHomeData(widget.token),
             child: _navIcon(Icons.home, true),
           ),
-          _navIcon(Icons.anchor, false),
-          _navIcon(Icons.storefront_outlined, false),
-          _navIcon(Icons.remove_red_eye_outlined, false),
+          GestureDetector(
+            onTap: () {
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => BatchPage(token: widget.token)),
+              // );
+            },
+            child: _navIcon(Icons.anchor, false),
+          ),
+          GestureDetector(
+            onTap: () {
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => MarketPage(token: widget.token)),
+              // );
+            },
+            child: _navIcon(Icons.storefront_outlined, false),
+          ),
+          GestureDetector(
+            onTap: () {
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => EmailPage(token: widget.token)),
+              // );
+            },
+            child: _navIcon(Icons.remove_red_eye_outlined, false),
+          ),
           GestureDetector(
             onTap: () {
               Navigator.push(
