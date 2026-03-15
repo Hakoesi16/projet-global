@@ -234,4 +234,60 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthError(e.toString()));
     }
   }
+
+
+
+
+
+
+
+//new partie
+  // --- SETUP PROFILE ---
+  Future<void> submitSetup({
+    required String token,
+    required String fullName,
+    required String nationalId,
+    required String phone,
+    required String email,
+    required String boatName,
+    required String registrationNumber,
+    required String vesselType,
+    required String homePort,
+    required String licenseNumber,
+    required String expiryDate,
+  }) async {
+    try {
+      emit(AuthLoading());
+      final response = await http.post(
+        Uri.parse("https://backend.com"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          "fullName": fullName,
+          "nationalId": nationalId,
+          "phone": phone,
+          "email": email,
+          "boatName": boatName,
+          "registrationNumber": registrationNumber,
+          "vesselType": vesselType,
+          "homePort": homePort,
+          "licenseNumber": licenseNumber,
+          "expiryDate": expiryDate,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        emit(SetupSuccess());
+      } else {
+        emit(AuthError("Setup failed: ${response.statusCode}"));
+      }
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+
+
 }

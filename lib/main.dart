@@ -4,6 +4,7 @@ import 'package:send/executt/begin.dart';
 import 'package:send/executt/succes.dart';
 
 import 'cubit/authcubit.dart';
+import 'executt/fileinfo.dart';
 
 void main() {
   runApp(
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: ProfilePage(token: '',),
+      home: Infopage(token: '',),
     );
   }
 }

@@ -18,22 +18,106 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   bool _notifications = true;
   bool _darkMode = false;
+  String _selectedLanguage = "English";
+
+  // Dictionnaire de traduction
+  final Map<String, Map<String, String>> _texts = {
+    "English": {
+      "profile": "Profile",
+      "edit": "Edit Profile",
+      "info": "ACCOUNT INFO",
+      "settings": "SETTINGS",
+      "notifications": "Notifications",
+      "darkMode": "Dark Mode",
+      "language": "Language",
+      "documents": "DOCUMENTS",
+      "upload": "Upload New",
+      "password": "Change Password",
+    },
+    "Français": {
+      "profile": "Profil",
+      "edit": "Modifier le Profil",
+      "info": "INFOS DU COMPTE",
+      "settings": "PARAMÈTRES",
+      "notifications": "Notifications",
+      "darkMode": "Mode Sombre",
+      "language": "Langue",
+      "documents": "DOCUMENTS",
+      "upload": "Enregistrer nouveau",
+      "password": "Changer le mot de passe",
+    },
+    "العربية": {
+      "profile": "الملف الشخصي",
+      "edit": "تعديل الملف",
+      "info": "معلومات الحساب",
+      "settings": "الإعدادات",
+      "notifications": "الإشعارات",
+      "darkMode": "الوضع الليلي",
+      "language": "اللغة",
+      "documents": "المستندات",
+      "upload": "تحميل جديد",
+      "password": "تغيير كلمة السر",
+    }
+  };
 
   @override
   void initState() {
     super.initState();
-    // On récupère le profil au chargement
     context.read<AuthCubit>().fetchProfile(widget.token);
+  }
+
+  void _showLanguageDialog() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                _selectedLanguage == "العربية" ? "اختر اللغة" : "Select Language",
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              _languageOption("English"),
+              _languageOption("Français"),
+              _languageOption("العربية"),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _languageOption(String lang) {
+    return ListTile(
+      title: Text(lang),
+      trailing: _selectedLanguage == lang
+          ? const Icon(Icons.check_circle, color: Color(0xFF013D73))
+          : null,
+      onTap: () {
+        setState(() {
+          _selectedLanguage = lang;
+        });
+        Navigator.pop(context);
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    var t = _texts[_selectedLanguage]!;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7F9),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: const Text("Profile", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: Text(t["profile"]!, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         centerTitle: true,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
@@ -54,59 +138,33 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // --- HEADER CARD ---
-                  _buildHeaderCard(user),
-
+                  _buildHeaderCard(user, t),
                   const SizedBox(height: 24),
-                  _buildSectionHeader("ACCOUNT INFO"),
+                  _buildSectionHeader(t["info"]!),
                   const SizedBox(height: 8),
                   _buildAccountInfoCard(user),
-
                   const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildSectionHeader("DOCUMENTS"),
+                      _buildSectionHeader(t["documents"]!),
                       TextButton.icon(
                         onPressed: () {},
                         icon: const Icon(Icons.upload_file, size: 18),
-                        label: const Text("Upload New"),
+                        label: Text(t["upload"]!),
                       )
                     ],
                   ),
                   _buildDocumentsCard(user),
-
                   const SizedBox(height: 24),
-                  _buildSectionHeader("SETTINGS"),
+                  _buildSectionHeader(t["settings"]!),
                   const SizedBox(height: 8),
-                  _buildSettingsCard(),
-
-                  const SizedBox(height: 100), // Espace pour la barre
+                  _buildSettingsCard(t),
+                  const SizedBox(height: 100),
                 ],
               ),
             );
           }
-
-          if (state is ProfileError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error_outline, color: Colors.red, size: 48),
-                    const SizedBox(height: 16),
-                    Text(state.message, textAlign: TextAlign.center),
-                    ElevatedButton(
-                      onPressed: () => context.read<AuthCubit>().fetchProfile(widget.token),
-                      child: const Text("Retry"),
-                    )
-                  ],
-                ),
-              ),
-            );
-          }
-
           return const Center(child: Text("No Profile Data"));
         },
       ),
@@ -121,7 +179,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildHeaderCard(Map<String, dynamic> user) {
+  Widget _buildHeaderCard(Map<String, dynamic> user, Map<String, String> t) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -150,7 +208,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfilePage(token: widget.token)));
                 },
                 icon: const Icon(Icons.edit, size: 18, color: Colors.white),
-                label: const Text("Edit Profile", style: TextStyle(color: Colors.white)),
+                label: Text(t["edit"]!, style: const TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF013D73),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -206,19 +264,24 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildSettingsCard() {
+  Widget _buildSettingsCard(Map<String, String> t) {
     return Container(
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
       child: Column(
         children: [
-          _settingsTile(Icons.lock_outline, "Change Password", trailing: const Icon(Icons.chevron_right, color: Colors.grey)),
+          _settingsTile(Icons.lock_outline, t["password"]!, trailing: const Icon(Icons.chevron_right, color: Colors.grey)),
           const Divider(),
-          _settingsTile(Icons.language, "Language", trailing: const Text("English >", style: TextStyle(color: Colors.grey))),
+          _settingsTile(
+            Icons.language, 
+            t["language"]!, 
+            trailing: Text("$_selectedLanguage >", style: const TextStyle(color: Colors.grey)),
+            onTap: _showLanguageDialog,
+          ),
           const Divider(),
-          _settingsTile(Icons.notifications_none, "Notifications",
+          _settingsTile(Icons.notifications_none, t["notifications"]!,
               trailing: Switch(value: _notifications, activeThumbColor: const Color(0xFF013D73), onChanged: (v) => setState(() => _notifications = v))),
           const Divider(),
-          _settingsTile(Icons.dark_mode_outlined, "Dark Mode",
+          _settingsTile(Icons.dark_mode_outlined, t["darkMode"]!,
               trailing: Switch(value: _darkMode, activeThumbColor: const Color(0xFF013D73), onChanged: (v) => setState(() => _darkMode = v))),
         ],
       ),
@@ -256,8 +319,9 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _settingsTile(IconData icon, String title, {required Widget trailing}) {
+  Widget _settingsTile(IconData icon, String title, {required Widget trailing, VoidCallback? onTap}) {
     return ListTile(
+      onTap: onTap,
       leading: Icon(icon, color: const Color(0xFF013D73)),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
       trailing: trailing,

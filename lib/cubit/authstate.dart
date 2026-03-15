@@ -54,3 +54,19 @@ class ProfileError extends AuthState {
   @override
   List<Object?> get props => [message];
 }
+
+
+
+
+
+class SetupLoading extends AuthState {}
+
+class SetupSuccess extends AuthState {}
+
+class SetupError extends AuthState {
+  final String message;
+  SetupError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
