@@ -1,4 +1,3 @@
-import 'package:checkmark/checkmark.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -95,7 +94,7 @@ class _InfopageState extends State<Infopage> {
           }
           else {
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(32),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -115,73 +114,89 @@ class _InfopageState extends State<Infopage> {
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                  "Personal Information", style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
+                              Row(
+                                children: [
+                                  const SizedBox(width: 12),
+                                  CircleAvatar(
+                                    radius: 15,
+                                    backgroundColor: Color(0xFF033F78),
+                                    child: Text("1",style: TextStyle(color: Colors.white),),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  const Text(
+                                      "Personal Information", style: TextStyle(
+                                      fontSize: 18, fontWeight: FontWeight.bold)),
+                                ],
+                              ),
                               const SizedBox(height: 16),
                               const Text("Full Name", style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w500)),
                               const SizedBox(height: 8),
-                              TextField(
-                                controller: _fullNameController,
-                                style: TextStyle(color: Colors.grey[600]),
-                                decoration: const InputDecoration(
-                                  hintText: "Enter your full name",
-                                  hintStyle: TextStyle(color: Color(0xFF6B7280)),
-                                  border: OutlineInputBorder(
-                                    borderRadius: const BorderRadius.all(Radius.circular(6.0),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                              customTextField("Entre your full name",_fullNameController),
                               const SizedBox(height: 16),
                               const Text("National ID/Passport", style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w500)),
                               const SizedBox(height: 8),
-                              TextField(
-                                controller: _nationalIdController,
-                                style: TextStyle(color: Colors.grey),
-                                decoration: const InputDecoration(
-                                  hintText: "Enter your national ID",
-                                  hintStyle: TextStyle(color: Color(0xFF6B7280)),
-                                  border: OutlineInputBorder(
-                                    borderRadius: const BorderRadius.all(Radius.circular(5.0),
-                                  ),
-                                ),
-                              ),
-                              ),
+                              customTextField("Entre National Id",_nationalIdController),
                               const SizedBox(height: 16),
                               const Text("Phone Number", style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w500)),
                               const SizedBox(height: 8),
-                              TextField(
-                                controller: _phoneController,
-                                style: TextStyle(color: Colors.grey),
-                                decoration: const InputDecoration(
-                                  hintText: "Enter your phone number",
-                                  hintStyle: TextStyle(color: Color(0xFF6B7280)),
-                                  border: OutlineInputBorder(
-                                    borderRadius: const BorderRadius.all(Radius.circular(4.0),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                              customTextField("Entre your phone number",_phoneController),
                               const SizedBox(height: 16),
                               const Text("Email Address", style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w500)),
                               const SizedBox(height: 8),
-                              TextField(
-                                controller: _emailController,
-                                style: TextStyle(color: Colors.grey),
-                                decoration: const InputDecoration(
-                                  hintText: "Enter your email address",
-                                  hintStyle: TextStyle(color: Color(0xFF6B7280)),
-                                  border: OutlineInputBorder(
-                                    borderRadius: const BorderRadius.all(Radius.circular(4.5),
-                                    ),
+                              customTextField("Entre your Email address",_emailController),
+                              const SizedBox(height: 16),
+                            ]
+
+                        )
+                    ),
+                    Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 10,
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const SizedBox(width: 12),
+                                  CircleAvatar(
+                                    radius: 15,
+                                    backgroundColor: Color(0xFF033F78),
+                                    child: Text("2",style: TextStyle(color: Colors.white),),
                                   ),
-                                ),
+                                  const SizedBox(width: 10),
+                                  const Text(
+                                      "Boat details", style: TextStyle(
+                                      fontSize: 18, fontWeight: FontWeight.bold)),
+                                ],
                               ),
+                              const SizedBox(height: 16),
+                              const Text("Boat Name", style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.w500)),
+                              const SizedBox(height: 8),
+                              customTextField("Entre your Boat name",_boatNameController),
+                              const SizedBox(height: 16),
+                              const Text("Registration Number", style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.w500)),
+                              const SizedBox(height: 8),
+                              customTextField("Entre your Registration Number",_registrationController),
+                              const SizedBox(height: 16),
+                              const Text("Home Port", style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.w500)),
+                              const SizedBox(height: 8),
+                              portTextField("City,Port Name",_homePortController),
                               const SizedBox(height: 16),
                             ]
 
@@ -196,4 +211,39 @@ class _InfopageState extends State<Infopage> {
 ),
     );
   }
+}
+
+
+Widget customTextField(String hint, TextEditingController controller) {
+  return TextField(
+    controller: controller,
+    decoration: InputDecoration(
+      hintText: hint,
+      hintStyle: TextStyle(color: Color(0xFF6B7280)),
+      filled: true,
+      fillColor: Color(0xFFF3F4F6),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+    ),
+  );
+}
+
+
+Widget portTextField(String hint, TextEditingController controller) {
+  return TextField(
+    controller: controller,
+    decoration: InputDecoration(
+      prefix: Icon(Icons.location_on,color: Colors.lightBlueAccent,),
+      hintText: hint,
+      hintStyle: TextStyle(color: Color(0xFF6B7280)),
+      filled: true,
+      fillColor: Color(0xFFF3F4F6),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+    ),
+  );
 }
