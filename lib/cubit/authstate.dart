@@ -6,13 +6,11 @@ abstract class AuthState extends Equatable {
 }
 
 class AuthInitial extends AuthState {}
-
 class AuthLoading extends AuthState {}
 
 class AuthAuthenticated extends AuthState {
   final Map<String, dynamic> userData;
   AuthAuthenticated(this.userData);
-
   @override
   List<Object?> get props => [userData];
 }
@@ -20,19 +18,16 @@ class AuthAuthenticated extends AuthState {
 class AuthError extends AuthState {
   final String message;
   AuthError(this.message);
-
   @override
   List<Object?> get props => [message];
 }
 
 class EmailSentSuccess extends AuthState {}
-
 class CodeVerifiedSuccess extends AuthState {}
 
 class ProfileLoaded extends AuthState {
   final Map<String, dynamic> user;
   ProfileLoaded(this.user);
-
   @override
   List<Object?> get props => [user];
 }
@@ -40,33 +35,18 @@ class ProfileLoaded extends AuthState {
 class HomeDataLoaded extends AuthState {
   final Map<String, dynamic> data;
   HomeDataLoaded(this.data);
-
   @override
   List<Object?> get props => [data];
 }
 
 class ProfileUpdatedSuccess extends AuthState {}
 
+class SetupLoading extends AuthState {}
+class SetupSuccess extends AuthState {}
+
 class ProfileError extends AuthState {
   final String message;
   ProfileError(this.message);
-
-  @override
-  List<Object?> get props => [message];
-}
-
-
-
-
-
-class SetupLoading extends AuthState {}
-
-class SetupSuccess extends AuthState {}
-
-class SetupError extends AuthState {
-  final String message;
-  SetupError(this.message);
-
   @override
   List<Object?> get props => [message];
 }

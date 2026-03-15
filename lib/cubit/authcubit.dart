@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -24,7 +25,7 @@ class AuthCubit extends Cubit<AuthState> {
 
       final googleAuth = await googleUser.authentication;
       final response = await http.post(
-        Uri.parse("https://backend.com"),
+        Uri.parse("$_baseUrl/google-login"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"idToken": googleAuth.idToken}),
       );
@@ -52,7 +53,7 @@ class AuthCubit extends Cubit<AuthState> {
       }
 
       final response = await http.post(
-        Uri.parse("https://backend.com"),
+        Uri.parse("$_baseUrl/facebook-login"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"accessToken": result.accessToken!.token}),
       );
@@ -73,7 +74,7 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       emit(AuthLoading());
       final response = await http.post(
-        Uri.parse("https://backend.com"),
+        Uri.parse("$_baseUrl/api/login"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"email": email, "password": password}),
       );
@@ -94,7 +95,7 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       emit(AuthLoading());
       final response = await http.post(
-        Uri.parse("https://backend.com"),
+        Uri.parse("$_baseUrl/api/register"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"email": email, "password": password}),
       );
@@ -112,10 +113,9 @@ class AuthCubit extends Cubit<AuthState> {
 
   // --- PROFIL ---
   Future<void> fetchProfile(String token) async {
-    // For testing purposes, emitting dummy data
     emit(ProfileLoaded({
-      "name": "Captain Hako",
-      "email": "hako@gmail.com",
+      "name": "Captain Ahmed",
+      "email": "ahmed@mail.com",
       "boatName": "Sea Explorer",
       "registration": "MAR-9999",
       "homePort": "Oran",
@@ -127,11 +127,9 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> fetchHomeData(String token) async {
     try {
       emit(AuthLoading());
-      // Simulation d'un appel API
       await Future.delayed(const Duration(seconds: 1));
-      
       emit(HomeDataLoaded({
-        "userName": "Capt. Hako",
+        "userName": "Capt. Ahmed",
         "earnings": "12,450.00 DA",
         "earningsTrend": "8.4%",
         "weight": "4,250 kg",
@@ -164,7 +162,7 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       emit(AuthLoading());
       final response = await http.put(
-        Uri.parse("https://backend.com"),
+        Uri.parse("$_baseUrl/api/profile"),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
@@ -187,6 +185,64 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  // --- COMPLETE SETUP (MULTIPART) ---
+  Future<void> submitSetup({
+    required String token,
+    required String fullName,
+    required String nationalId,
+    required String phone,
+    required String email,
+    required String boatName,
+    required String registrationNumber,
+    required String vesselType,
+    required String homePort,
+    required String licenseNumber,
+    required String expiryDate,
+    File? fishingLicense,
+    File? boatRegistration,
+  }) async {
+    try {
+      emit(SetupLoading());
+
+      var request = http.MultipartRequest('POST', Uri.parse("$_baseUrl/api/complete-setup"));//un type de http envoier a la fois text et fichier
+      request.headers.addAll({
+        "Authorization": "Bearer $token",
+        "Content-Type": "multipart/form-data",//la forme de donner ou backend se accepter
+      });
+
+      // Champs textes
+      request.fields['fullName'] = fullName;
+      request.fields['nationalId'] = nationalId;
+      request.fields['phone'] = phone;
+      request.fields['email'] = email;
+      request.fields['boatName'] = boatName;
+      request.fields['registrationNumber'] = registrationNumber;
+      request.fields['vesselType'] = vesselType;
+      request.fields['homePort'] = homePort;
+      request.fields['licenseNumber'] = licenseNumber;
+      request.fields['expiryDate'] = expiryDate;
+
+      // Ajout des fichiers
+      if (fishingLicense != null) {
+        request.files.add(await http.MultipartFile.fromPath('fishingLicense', fishingLicense.path));
+      }
+      if (boatRegistration != null) {
+        request.files.add(await http.MultipartFile.fromPath('boatRegistration', boatRegistration.path));
+      }
+
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        emit(SetupSuccess());
+      } else {
+        emit(AuthError("Setup failed: ${response.body}"));
+      }
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
   // --- LOGOUT ---
   Future<void> logout() async {
     try {
@@ -203,7 +259,7 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       emit(AuthLoading());
       final response = await http.post(
-        Uri.parse("https://backend.com"),
+        Uri.parse("$_baseUrl/api/send-email"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"email": email}),
       );
@@ -221,7 +277,7 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       emit(AuthLoading());
       final response = await http.post(
-        Uri.parse("https://backend.com"),
+        Uri.parse("$_baseUrl/api/verify-code"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"email": email, "code": code}),
       );
@@ -234,60 +290,4 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthError(e.toString()));
     }
   }
-
-
-
-
-
-
-
-//new partie
-  // --- SETUP PROFILE ---
-  Future<void> submitSetup({
-    required String token,
-    required String fullName,
-    required String nationalId,
-    required String phone,
-    required String email,
-    required String boatName,
-    required String registrationNumber,
-    required String vesselType,
-    required String homePort,
-    required String licenseNumber,
-    required String expiryDate,
-  }) async {
-    try {
-      emit(AuthLoading());
-      final response = await http.post(
-        Uri.parse("https://backend.com"),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
-        },
-        body: jsonEncode({
-          "fullName": fullName,
-          "nationalId": nationalId,
-          "phone": phone,
-          "email": email,
-          "boatName": boatName,
-          "registrationNumber": registrationNumber,
-          "vesselType": vesselType,
-          "homePort": homePort,
-          "licenseNumber": licenseNumber,
-          "expiryDate": expiryDate,
-        }),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        emit(SetupSuccess());
-      } else {
-        emit(AuthError("Setup failed: ${response.statusCode}"));
-      }
-    } catch (e) {
-      emit(AuthError(e.toString()));
-    }
-  }
-
-
-
 }
