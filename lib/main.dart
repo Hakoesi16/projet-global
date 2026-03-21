@@ -5,6 +5,7 @@ import 'package:send/executt/succes.dart';
 
 import 'cubit/authcubit.dart';
 import 'executt/fileinfo.dart';
+import 'executt/succesverfc.dart';
 
 void main() {
   runApp(
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Infopage(token: '',),
+      home: VetInspectionPage(token: '', batchId: '',),
     );
   }
 }

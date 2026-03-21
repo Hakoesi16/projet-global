@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:send/executt/succesverfc.dart';
 
 import '../cubit/authcubit.dart';
 import '../cubit/authstate.dart';
@@ -172,7 +173,7 @@ class _InfopageState extends State<Infopage> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   child: MaterialButton(onPressed: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage(token: widget.token)));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => VetInspectionPage(token: widget.token, batchId: '',)));
                   },child: const Text("Complete Setup", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),)
                 ),
                 const SizedBox(height: 24),

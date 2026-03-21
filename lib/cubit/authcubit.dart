@@ -150,6 +150,58 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthError(e.toString()));
     }
   }
+// --- VET INSPECTION DATA ---
+
+
+//   Future<void> fetchInspectionDetails(String batchId, String token) async {
+//     try {
+//       emit(AuthLoading());
+//
+//       final response = await http.get(
+//         Uri.parse("https://yourbackend.com/api/inspection/$batchId"),
+//         headers: {
+//           "Content-Type": "application/json",
+//           "Authorization": "Bearer $token", // 🔐 important
+//         },
+//       );
+//
+//       if (response.statusCode == 200) {
+//         final data = jsonDecode(response.body);
+//
+//         emit(InspectionDataLoaded({
+//           "status": data["status"],
+//           "batchId": data["batchId"],
+//           "fisherName": data["fisherName"],
+//           "fishType": data["fishType"],
+//           "expiryDate": data["expiryDate"],
+//           "timeLeft": data["timeLeft"],
+//         }));
+//       } else {
+//         emit(AuthError("Failed to load inspection data"));
+//       }
+//     } catch (e) {
+//       emit(AuthError(e.toString()));
+//     }
+//   }
+  // --- VET INSPECTION DATA ---par simulation
+  Future<void> fetchInspectionDetails(String batchId, String token) async {
+    try {
+      emit(AuthLoading());
+      // Simulation d'un appel API avec délai
+      await Future.delayed(const Duration(milliseconds: 800));
+      
+      emit(InspectionDataLoaded({
+        "status": "Approved",
+        "batchId": "#FSH-99283",
+        "fisherName": "Captain Elias",
+        "fishType": "Sardin",
+        "expiryDate": "Mar 21, 2026",
+        "timeLeft": "01 Day, 23 hours restants",
+      }));
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
 
   // --- UPDATE PROFIL ---
   Future<void> updateProfile({
@@ -204,13 +256,12 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       emit(SetupLoading());
 
-      var request = http.MultipartRequest('POST', Uri.parse("$_baseUrl/api/complete-setup"));//un type de http envoier a la fois text et fichier
+      var request = http.MultipartRequest('POST', Uri.parse("$_baseUrl/api/complete-setup"));
       request.headers.addAll({
         "Authorization": "Bearer $token",
-        "Content-Type": "multipart/form-data",//la forme de donner ou backend se accepter
+        "Content-Type": "multipart/form-data",
       });
 
-      // Champs textes
       request.fields['fullName'] = fullName;
       request.fields['nationalId'] = nationalId;
       request.fields['phone'] = phone;
@@ -222,7 +273,6 @@ class AuthCubit extends Cubit<AuthState> {
       request.fields['licenseNumber'] = licenseNumber;
       request.fields['expiryDate'] = expiryDate;
 
-      // Ajout des fichiers
       if (fishingLicense != null) {
         request.files.add(await http.MultipartFile.fromPath('fishingLicense', fishingLicense.path));
       }

@@ -39,8 +39,14 @@ class HomeDataLoaded extends AuthState {
   List<Object?> get props => [data];
 }
 
-class ProfileUpdatedSuccess extends AuthState {}
+class InspectionDataLoaded extends AuthState { // Nouvel état pour Vet Inspection
+  final Map<String, dynamic> data;
+  InspectionDataLoaded(this.data);
+  @override
+  List<Object?> get props => [data];
+}
 
+class ProfileUpdatedSuccess extends AuthState {}
 class SetupLoading extends AuthState {}
 class SetupSuccess extends AuthState {}
 
