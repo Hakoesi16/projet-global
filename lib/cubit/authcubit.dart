@@ -183,6 +183,35 @@ class AuthCubit extends Cubit<AuthState> {
 //       emit(AuthError(e.toString()));
 //     }
 //   }
+
+  Future<void> sendRejectionReason({
+    required String batchId,
+    required String reason,
+    required String token,
+  }) async {
+    try {    emit(AuthLoading());
+    final response = await http.post(
+      Uri.parse("$_baseUrl/api/reject-batch"),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+      body: jsonEncode({
+        "batchId": batchId,
+        "reason": reason,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // Vous pouvez émettre un état de succès ici
+      emit(InspectionDataLoaded(jsonDecode(response.body)));
+    } else {
+      emit(AuthError("Failed to send rejection"));
+    }
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
   // --- VET INSPECTION DATA ---par simulation
   Future<void> fetchInspectionDetails(String batchId, String token) async {
     try {
