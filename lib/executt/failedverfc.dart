@@ -58,37 +58,6 @@ class _FailedvetPageState extends State<FailedvetPage> {
     }
   }
 
-  void _showQRCode(String batchId) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text("Batch QR Code", textAlign: TextAlign.center),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFF013D73), width: 2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(Icons.qr_code_2, size: 150, color: Color(0xFF013D73)),
-            ),
-            const SizedBox(height: 16),
-            Text("ID: $batchId", style: const TextStyle(fontWeight: FontWeight.bold)),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Close"),
-          )
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,11 +108,11 @@ class _FailedvetPageState extends State<FailedvetPage> {
                   ),
                   const SizedBox(height: 12),
                   _buildActionCard(
-                    icon: Icons.qr_code_2_outlined,
-                    title: "Generate Batch QR",
-                    subtitle: "Scan to verify authenticity",
+                    icon: Icons.remove_red_eye_outlined,
+                    title: "View Batch Report",
+                    subtitle: "",
                     actionIcon: Icons.open_in_new_outlined,
-                    onTap: () => _showQRCode(data["batchId"]),
+                    onTap: () {},
                   ),
                 ],
               ),
@@ -164,36 +133,51 @@ class _FailedvetPageState extends State<FailedvetPage> {
   Widget _buildStatusCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.symmetric(vertical: 40),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFEBEE), // Rouge très clair pour Rejeté
-        borderRadius: BorderRadius.circular(20),
+        color: const Color(0xFFF9B1B1), // Rose/Rouge clair selon l'image
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          )
+        ],
       ),
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
-              color: Colors.red,
-              shape: BoxShape.circle,
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.2), // Rectangle arrondi pour l'icône
+              borderRadius: BorderRadius.circular(20),
             ),
-            child: const Icon(Icons.close, color: Colors.white, size: 30),
+            child: const Icon(
+              Icons.block, 
+              color: Color(0xFFE53935), // Rouge foncé pour l'icône
+              size: 45
+            ),
           ),
-          const SizedBox(height: 20),
-          const Text("REJECTED",
+          const SizedBox(height: 24),
+          const Text(
+            "REJECTED",
             style: TextStyle(
-              color: Colors.red,
-              fontSize: 28,
+              color: Color(0xFFE53935), // Rouge foncé pour le texte
+              fontSize: 34,
               fontWeight: FontWeight.w900,
-              letterSpacing: 1.5,
+              letterSpacing: 1,
             ),
           ),
+          const SizedBox(height: 8),
           const Text(
             "PROTOCOL VERIFICATION FAILED",
             style: TextStyle(
-              color: Colors.red,
+              color: Color(0xFFE53935),
               fontSize: 14,
               fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
             ),
           ),
         ],
@@ -203,7 +187,7 @@ class _FailedvetPageState extends State<FailedvetPage> {
 
   Widget _buildSectionTitle(String title) {
     return Container(
-      padding: EdgeInsets.only(left: 10),
+      padding: const EdgeInsets.only(left: 10),
       child: Text(
         title,
         style: const TextStyle(
@@ -273,7 +257,7 @@ class _FailedvetPageState extends State<FailedvetPage> {
           ElevatedButton(
             onPressed: _submitRejection,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: const Color(0xFFE53935),
               minimumSize: const Size(double.infinity, 50),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
@@ -301,7 +285,7 @@ class _FailedvetPageState extends State<FailedvetPage> {
                 color: const Color(0xFFF1F5F9),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon, color: Colors.red),
+              child: Icon(icon, color: const Color(0xFFE53935)),
             ),
             const SizedBox(width: 16),
             Expanded(

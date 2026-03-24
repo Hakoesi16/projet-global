@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:url_launcher/url_launcher.dart'; // Pour le téléchargement
+import 'package:url_launcher/url_launcher.dart';
 import '../cubit/authcubit.dart';
 import '../cubit/authstate.dart';
 
@@ -25,53 +25,15 @@ class _VetInspectionPageState extends State<VetInspectionPage> {
     context.read<AuthCubit>().fetchInspectionDetails(widget.batchId, widget.token);
   }
 
-  // Fonction pour simuler le téléchargement du PDF
   Future<void> _downloadCertificate(String? url) async {
     final Uri uri = Uri.parse(url ?? "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf");
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {//si ouverture echouer
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Could not launch download")),
         );
       }
     }
-  }
-
-  // Fonction pour afficher le QR Code
-  void _showQRCode(String batchId) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text("Batch QR Code", textAlign: TextAlign.center),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                border: Border.all(color: const Color(0xFF013D73), width: 2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(Icons.qr_code_2, size: 150, color: Color(0xFF013D73)),
-            ),
-            const SizedBox(height: 16),
-            Text("ID: $batchId", style: const TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            const Text("Scan to verify batch authenticity", 
-                 textAlign: TextAlign.center, 
-                 style: TextStyle(fontSize: 12, color: Colors.grey)),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Close", style: TextStyle(color: Color(0xFF013D73))),
-          )
-        ],
-      ),
-    );
   }
 
   @override
@@ -123,11 +85,11 @@ class _VetInspectionPageState extends State<VetInspectionPage> {
                   ),
                   const SizedBox(height: 12),
                   _buildActionCard(
-                    icon: Icons.qr_code_2_outlined,
-                    title: "Generate Batch QR",
-                    subtitle: "Scan to verify authenticity",
+                    icon: Icons.remove_red_eye_outlined,
+                    title: "View Batch Report",
+                    subtitle: "",
                     actionIcon: Icons.open_in_new_outlined,
-                    onTap: () => _showQRCode(data["batchId"]),
+                    onTap: () {},
                   ),
                 ],
               ),
@@ -148,13 +110,13 @@ class _VetInspectionPageState extends State<VetInspectionPage> {
   Widget _buildStatusCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.symmetric(vertical: 40),
       decoration: BoxDecoration(
-        color: const Color(0xFFA1D9C4),
-        borderRadius: BorderRadius.circular(20),
+        color: const Color(0xFF98E2C6), // Vert menthe de l'image
+        borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFA1D9C4).withValues(alpha: 0.3),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 20,
             offset: const Offset(0, 10),
           )
@@ -163,29 +125,45 @@ class _VetInspectionPageState extends State<VetInspectionPage> {
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
-              color: Color(0xFF013D73),
-              shape: BoxShape.circle,
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.3), // Carré arrondi clair
+              borderRadius: BorderRadius.circular(20),
             ),
-            child: const Icon(Icons.check, color: Colors.white, size: 30),
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF006F63),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check,
+                  color: Colors.white,
+                  size: 30,
+                ),
+              ),
+            ),
           ),
-          const SizedBox(height: 20),
-          const Text("APPROVED",
+          const SizedBox(height: 24),
+          const Text(
+            "APPROVED",
             style: TextStyle(
-              color: Color(0xFF013D73),
-              fontSize: 28,
+              color: Color(0xFF006F63), // Texte vert foncé
+              fontSize: 34,
               fontWeight: FontWeight.w900,
               letterSpacing: 1.5,
             ),
           ),
+          const SizedBox(height: 8),
           const Text(
             "PROTOCOL VERIFICATION PASSED",
             style: TextStyle(
-              color: Color(0xFF013D73),
+              color: Color(0xFF006F63),
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              letterSpacing: 1,
+              letterSpacing: 0.5,
             ),
           ),
         ],
