@@ -58,21 +58,22 @@ class _FailedvetPageState extends State<FailedvetPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F9),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF011A33)),
+          icon: Icon(Icons.arrow_back, color: isDark ? Colors.white : const Color(0xFF011A33)),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           "Vet Inspection",
-          style: TextStyle(color: Color(0xFF011A33), fontWeight: FontWeight.bold),
+          style: TextStyle(color: isDark ? Colors.white : const Color(0xFF011A33), fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -89,15 +90,15 @@ class _FailedvetPageState extends State<FailedvetPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildStatusCard(),
+                  _buildStatusCard(isDark),
                   const SizedBox(height: 32),
-                  _buildSectionTitle("Batch Identity"),
+                  _buildSectionTitle("Batch Identity", isDark),
                   const SizedBox(height: 12),
-                  _buildIdentityCard(data),
+                  _buildIdentityCard(data, isDark),
                   const SizedBox(height: 24),
-                  _buildSectionTitle("Mandatory Rejection Reasons"),
+                  _buildSectionTitle("Mandatory Rejection Reasons", isDark),
                   const SizedBox(height: 12),
-                  _buildRejectionInputCard(),
+                  _buildRejectionInputCard(isDark),
                   const SizedBox(height: 24),
                   _buildActionCard(
                     icon: Icons.picture_as_pdf_outlined,
@@ -105,14 +106,16 @@ class _FailedvetPageState extends State<FailedvetPage> {
                     subtitle: "PDF format - 1.2 MB",
                     actionIcon: Icons.download_outlined,
                     onTap: () => _downloadCertificate(data["pdfUrl"]),
+                    isDark: isDark,
                   ),
                   const SizedBox(height: 12),
                   _buildActionCard(
                     icon: Icons.remove_red_eye_outlined,
                     title: "View Batch Report",
-                    subtitle: "",
+                    subtitle: "Scan to verify authenticity",
                     actionIcon: Icons.open_in_new_outlined,
                     onTap: () {},
+                    isDark: isDark,
                   ),
                 ],
               ),
@@ -130,12 +133,13 @@ class _FailedvetPageState extends State<FailedvetPage> {
     );
   }
 
-  Widget _buildStatusCard() {
+  Widget _buildStatusCard(bool isDark) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 40),
       decoration: BoxDecoration(
-        color: const Color(0xFFF9B1B1), // Rose/Rouge clair selon l'image
+        // Couleur de fond adaptée au mode sombre
+        color: isDark ? const Color(0xFF422222) : const Color(0xFFFBABAB),
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
@@ -151,30 +155,30 @@ class _FailedvetPageState extends State<FailedvetPage> {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2), // Rectangle arrondi pour l'icône
+              color: isDark ? Colors.white10 : Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.block, 
-              color: Color(0xFFE53935), // Rouge foncé pour l'icône
+              color: isDark ? const Color(0xFFFF5252) : const Color(0xFFE53935),
               size: 45
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             "REJECTED",
             style: TextStyle(
-              color: Color(0xFFE53935), // Rouge foncé pour le texte
+              color: isDark ? const Color(0xFFFF5252) : const Color(0xFFE53935),
               fontSize: 34,
               fontWeight: FontWeight.w900,
               letterSpacing: 1,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             "PROTOCOL VERIFICATION FAILED",
             style: TextStyle(
-              color: Color(0xFFE53935),
+              color: isDark ? Colors.white70 : const Color(0xFFE53935),
               fontSize: 14,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,
@@ -185,71 +189,72 @@ class _FailedvetPageState extends State<FailedvetPage> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, bool isDark) {
     return Container(
       padding: const EdgeInsets.only(left: 10),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF011A33),
+          color: isDark ? Colors.white : const Color(0xFF011A33),
         ),
       ),
     );
   }
 
-  Widget _buildIdentityCard(Map<String, dynamic> data) {
+  Widget _buildIdentityCard(Map<String, dynamic> data, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10)],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03), blurRadius: 10)],
       ),
       child: Column(
         children: [
-          _buildIdentityItem("BATCH ID", data["batchId"]),
+          _buildIdentityItem("BATCH ID", data["batchId"], isDark),
           const Divider(height: 32),
-          _buildIdentityItem("FISHER NAME", data["fisherName"]),
+          _buildIdentityItem("FISHER NAME", data["fisherName"], isDark),
           const Divider(height: 32),
-          _buildIdentityItem("FISH TYPE", data["fishType"]),
+          _buildIdentityItem("FISH TYPE", data["fishType"], isDark),
         ],
       ),
     );
   }
 
-  Widget _buildIdentityItem(String label, String value) {
+  Widget _buildIdentityItem(String label, String value, bool isDark) {
     return Row(
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold)),
+            Text(label, style: TextStyle(color: isDark ? Colors.white54 : Colors.grey, fontSize: 11, fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
-            Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF011A33))),
+            Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF011A33))),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildRejectionInputCard() {
+  Widget _buildRejectionInputCard(bool isDark) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor, // Utilisation de cardColor pour la cohérence
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: isDark ? Colors.white12 : const Color(0xFFE2E8F0)),
       ),
       child: Column(
         children: [
           TextField(
             controller: _rejectionController,
             maxLines: 4,
-            decoration: const InputDecoration(
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+            decoration: InputDecoration(
               hintText: "Required only if rejecting batch...",
-              hintStyle: TextStyle(color: Colors.grey),
+              hintStyle: TextStyle(color: isDark ? Colors.white38 : Colors.grey),
               border: InputBorder.none,
             ),
           ),
@@ -257,7 +262,7 @@ class _FailedvetPageState extends State<FailedvetPage> {
           ElevatedButton(
             onPressed: _submitRejection,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE53935),
+              backgroundColor: const Color(0xFFE53935), // Rouge pour l'action de rejet
               minimumSize: const Size(double.infinity, 50),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
@@ -268,13 +273,13 @@ class _FailedvetPageState extends State<FailedvetPage> {
     );
   }
 
-  Widget _buildActionCard({required IconData icon, required String title, String? subtitle, required IconData actionIcon, VoidCallback? onTap}) {
+  Widget _buildActionCard({required bool isDark, required IconData icon, required String title, String? subtitle, required IconData actionIcon, VoidCallback? onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -282,7 +287,7 @@ class _FailedvetPageState extends State<FailedvetPage> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
+                color: isDark ? Colors.white10 : const Color(0xFFF1F5F9),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, color: const Color(0xFFE53935)),
@@ -292,9 +297,16 @@ class _FailedvetPageState extends State<FailedvetPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  Text(
+                    title, 
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, 
+                      fontSize: 15,
+                      color: isDark ? Colors.white : Colors.black // Correction ici
+                    )
+                  ),
                   if (subtitle != null)
-                    Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                    Text(subtitle, style: TextStyle(color: isDark ? Colors.white54 : Colors.grey, fontSize: 12)),
                 ],
               ),
             ),

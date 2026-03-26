@@ -38,18 +38,25 @@ class _VetInspectionPageState extends State<VetInspectionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F9),
+      // Utilisation de la couleur de fond du thème
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        // Utilisation des couleurs du thème pour l'AppBar
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF011A33)),
+          icon: Icon(Icons.arrow_back, color: isDark ? Colors.white : Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           "Vet Inspection",
-          style: TextStyle(color: Color(0xFF011A33), fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: isDark ? Colors.white : const Color(0xFF011A33), 
+            fontWeight: FontWeight.bold
+          ),
         ),
         centerTitle: true,
       ),
@@ -66,15 +73,15 @@ class _VetInspectionPageState extends State<VetInspectionPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildStatusCard(),
+                  _buildStatusCard(isDark),
                   const SizedBox(height: 32),
-                  _buildSectionTitle("Batch Identity"),
+                  _buildSectionTitle("Batch Identity", isDark),
                   const SizedBox(height: 12),
-                  _buildIdentityCard(data),
+                  _buildIdentityCard(data, isDark),
                   const SizedBox(height: 24),
-                  _buildSectionTitle("Expiration Date"),
+                  _buildSectionTitle("Expiration Date", isDark),
                   const SizedBox(height: 12),
-                  _buildExpirationCard(data["expiryDate"], data["timeLeft"]),
+                  _buildExpirationCard(data["expiryDate"], data["timeLeft"], isDark),
                   const SizedBox(height: 24),
                   _buildActionCard(
                     icon: Icons.picture_as_pdf_outlined,
@@ -82,6 +89,7 @@ class _VetInspectionPageState extends State<VetInspectionPage> {
                     subtitle: "PDF format - 1.2 MB",
                     actionIcon: Icons.download_outlined,
                     onTap: () => _downloadCertificate(data["pdfUrl"]),
+                    isDark: isDark,
                   ),
                   const SizedBox(height: 12),
                   _buildActionCard(
@@ -90,6 +98,7 @@ class _VetInspectionPageState extends State<VetInspectionPage> {
                     subtitle: "",
                     actionIcon: Icons.open_in_new_outlined,
                     onTap: () {},
+                    isDark: isDark,
                   ),
                 ],
               ),
@@ -107,16 +116,17 @@ class _VetInspectionPageState extends State<VetInspectionPage> {
     );
   }
 
-  Widget _buildStatusCard() {
+  Widget _buildStatusCard(bool isDark) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 40),
       decoration: BoxDecoration(
-        color: const Color(0xFF98E2C6), // Vert menthe de l'image
+        // On garde l'aspect vert même en dark mode mais on l'adapte
+        color: isDark ? const Color(0xFF004D40) : const Color(0xFF98E2C6),
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 10),
           )
@@ -128,7 +138,7 @@ class _VetInspectionPageState extends State<VetInspectionPage> {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.3), // Carré arrondi clair
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Center(
@@ -138,29 +148,25 @@ class _VetInspectionPageState extends State<VetInspectionPage> {
                   color: Color(0xFF006F63),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.check,
-                  color: Colors.white,
-                  size: 30,
-                ),
+                child: const Icon(Icons.check, color: Colors.white, size: 30),
               ),
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             "APPROVED",
             style: TextStyle(
-              color: Color(0xFF006F63), // Texte vert foncé
+              color: isDark ? Colors.white : const Color(0xFF006F63),
               fontSize: 34,
               fontWeight: FontWeight.w900,
               letterSpacing: 1.5,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             "PROTOCOL VERIFICATION PASSED",
             style: TextStyle(
-              color: Color(0xFF006F63),
+              color: isDark ? Colors.white70 : const Color(0xFF006F63),
               fontSize: 14,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,
@@ -171,57 +177,62 @@ class _VetInspectionPageState extends State<VetInspectionPage> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, bool isDark) {
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.bold,
-        color: Color(0xFF011A33),
+        color: isDark ? Colors.white : const Color(0xFF011A33),
       ),
     );
   }
 
-  Widget _buildIdentityCard(Map<String, dynamic> data) {
+  Widget _buildIdentityCard(Map<String, dynamic> data, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10)],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03), 
+            blurRadius: 10
+          )
+        ],
       ),
       child: Column(
         children: [
-          _buildIdentityItem("BATCH ID", data["batchId"]),
+          _buildIdentityItem("BATCH ID", data["batchId"], isDark),
           const Divider(height: 32),
-          _buildIdentityItem("FISHER NAME", data["fisherName"]),
+          _buildIdentityItem("FISHER NAME", data["fisherName"], isDark),
           const Divider(height: 32),
-          _buildIdentityItem("FISH TYPE", data["fishType"]),
+          _buildIdentityItem("FISH TYPE", data["fishType"], isDark),
         ],
       ),
     );
   }
 
-  Widget _buildIdentityItem(String label, String value) {
+  Widget _buildIdentityItem(String label, String value, bool isDark) {
     return Row(
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold)),
+            Text(label, style: TextStyle(color: isDark ? Colors.white54 : Colors.grey, fontSize: 11, fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
-            Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF011A33))),
+            Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF011A33))),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildExpirationCard(String date, String timeLeft) {
+  Widget _buildExpirationCard(String date, String timeLeft, bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -230,7 +241,7 @@ class _VetInspectionPageState extends State<VetInspectionPage> {
           const SizedBox(width: 16),
           Text(
             date,
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black),
           ),
           const SizedBox(width: 8),
           Text(
@@ -244,22 +255,21 @@ class _VetInspectionPageState extends State<VetInspectionPage> {
     );
   }
 
-  Widget _buildActionCard({required IconData icon, required String title, String? subtitle, required IconData actionIcon, VoidCallback? onTap}) {
+  Widget _buildActionCard({required bool isDark, required IconData icon, required String title, String? subtitle, required IconData actionIcon, VoidCallback? onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 5)],
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
+                color: isDark ? Colors.white10 : const Color(0xFFF1F5F9),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, color: const Color(0xFF00C2A0)),
@@ -269,7 +279,7 @@ class _VetInspectionPageState extends State<VetInspectionPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: isDark ? Colors.white : Colors.black)),
                   if (subtitle != null)
                     Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
                 ],

@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       builder: (context, themeMode) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'Finder',
+          title: "Let's Fishing",
           themeMode: themeMode,
           // --- THÈME CLAIR ---
           theme: ThemeData(
