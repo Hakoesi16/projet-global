@@ -113,15 +113,36 @@ class AuthCubit extends Cubit<AuthState> {
 
   // --- PROFIL ---
   Future<void> fetchProfile(String token) async {
-    emit(ProfileLoaded({
-      "name": "Captain Ahmed",
-      "email": "ahmed@mail.com",
-      "boatName": "Sea Explorer",
-      "registration": "MAR-9999",
-      "homePort": "Oran",
-      "licenseExpiry": "2026",
-    }));
+    try {
+      emit(AuthLoading());
+      final response = await http.get(
+        Uri.parse("https://api.example.com/profile"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        emit(ProfileLoaded(data));
+      } else {
+        emit(ProfileError("Failed to load profile"));
+      }
+    } catch (e) {
+      emit(ProfileError(e.toString()));
+    }
   }
+  // Future<void> fetchProfile(String token) async {
+  //   emit(ProfileLoaded({
+  //     "name": "Captain Ahmed",
+  //     "email": "ahmed@mail.com",
+  //     "boatName": "Sea Explorer",
+  //     "registration": "MAR-9999",
+  //     "homePort": "Oran",
+  //     "licenseExpiry": "2026",
+  //   }));
+  // }
 
   // --- HOME DATA ---
   Future<void> fetchHomeData(String token) async {

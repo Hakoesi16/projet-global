@@ -168,7 +168,7 @@ class _WeatherSafetyState extends State<WeatherSafetypage> {
                     Expanded(
                       child: WeatherInfo(
                         title: "waves",
-                        value: "Strong",
+                        value: "188m",
                         icon1: Icons.waves,
                       ),
                     ),
@@ -383,7 +383,7 @@ class _WeatherSafetyState extends State<WeatherSafetypage> {
             Row(
               spacing: 5,
               children: [
-                // Expanded(child: Cardinfo(Color(0xFF033F78),Icons.waves_outlined,"TIDE\nTIME","High","${_highTide?.substring(11,16)}","Low","${_lowTide?.substring(11,16)}")),
+                Expanded(child: Cardinfo(Color(0xFF033F78),Icons.waves_outlined,"TIDE\nTIME","High","07:30","Low","14:45")),
                 Expanded(child: Cardinfo(Color(0xFFF97316),Icons.wb_sunny_outlined,"DAILY\nGHT","RISE","${_sunrise!.substring(11,16)}","SET","${_sunset!.substring(11,16)}")),
               ],
             )

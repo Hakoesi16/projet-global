@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'cubit/authcubit.dart';
 import 'cubit/themecubit.dart';
 import 'executt/begin.dart';
+import 'executt/fileinfo.dart';
 import 'executt/setupvit.dart';
 import 'executt/wether.dart';
 
@@ -70,7 +71,7 @@ class MyApp extends StatelessWidget {
             ),
             dividerTheme: const DividerThemeData(color: Colors.white12),
           ),
-          home: const WeatherSafetypage(),
+          home: const ProfilePage(token: '')
         );
       },
     );
