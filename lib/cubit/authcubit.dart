@@ -10,9 +10,39 @@ class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(AuthInitial());
 
   final String _baseUrl = "https://yourbackend.com";
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    serverClientId: "936821595024-uek9ov9mlscdqvbg483dughq9b5u1ksi.apps.googleusercontent.com",
+  );
+  // final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   // --- LOGIN GOOGLE ---
+  // Future<void> signInWithGoogle() async {
+  //   try {
+  //     emit(AuthLoading());
+  //     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+  //
+  //     if (googleUser == null) {
+  //       emit(AuthError("User cancelled"));
+  //       return;
+  //     }
+  //
+  //     final googleAuth = await googleUser.authentication;
+  //     final response = await http.post(
+  //       Uri.parse("$_baseUrl/google-login"),
+  //       headers: {"Content-Type": "application/json"},
+  //       body: jsonEncode({"idToken": googleAuth.idToken}),
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       final data = jsonDecode(response.body);
+  //       emit(AuthAuthenticated(data));
+  //     } else {
+  //       emit(AuthError("Server error during Google login"));
+  //     }
+  //   } catch (e) {
+  //     emit(AuthError(e.toString()));
+  //   }
+  // }
   Future<void> signInWithGoogle() async {
     try {
       emit(AuthLoading());
@@ -24,17 +54,24 @@ class AuthCubit extends Cubit<AuthState> {
       }
 
       final googleAuth = await googleUser.authentication;
+      final String? idToken = googleAuth.idToken;
+      final String? serverAuthCode = googleUser.serverAuthCode;
+
       final response = await http.post(
         Uri.parse("$_baseUrl/google-login"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"idToken": googleAuth.idToken}),
+        body: jsonEncode({
+          "idToken": idToken,
+          "clientId": "936821595024-uek9ov9mlscdqvbg483dughq9b5u1ksi.apps.googleusercontent.com", // Web Client ID
+          "serverAuthCode": serverAuthCode,
+        }),
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         emit(AuthAuthenticated(data));
       } else {
-        emit(AuthError("Server error during Google login"));
+        emit(AuthError("Server error: ${response.body}")); //  affiche le vrai message
       }
     } catch (e) {
       emit(AuthError(e.toString()));
@@ -442,6 +479,69 @@ class AuthCubit extends Cubit<AuthState> {
       }
     } catch (e) {
       emit(AuthError(e.toString()));
+    }
+  }
+Future<void> fetchvitProfile(String token) async {
+  emit(ProfileLoaded({
+    "name_vit": "Dr mohamed",
+    "email_vit": "mohamed@mail.com",
+    "boatName_vit": "Sea Explorer",
+    "homePort_vit": "Oran",
+    "phone_vit_number":"+213 550515255"
+  }));
+}
+// --- UPDATE PROFIL vitirinaire ---
+  Future<void> updateProfilevit({
+    required String token,
+    required String name,
+    required String phone,
+    required String homePort,
+    required String boatName,
+  }) async {
+    try {
+      emit(AuthLoading());
+      final response = await http.put(
+        Uri.parse("$_baseUrl/api/profile"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          "name": name,
+          "phone": phone,
+          "homePort": homePort,
+          "boatName": boatName,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        emit(ProfileUpdatedSuccess());
+      } else {
+        emit(ProfileError("Update failed"));
+      }
+    } catch (e) {
+      emit(ProfileError(e.toString()));
+    }
+  }
+  Future<void> fetchConsumerProfile(String token) async {
+    try {
+      emit(AuthLoading());
+      final response = await http.get(
+        Uri.parse("https://api.example.com/profileConsumer"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        emit(ProfileLoaded(data));
+      } else {
+        emit(ProfileError("Failed to load profile"));
+      }
+    } catch (e) {
+      emit(ProfileError(e.toString()));
     }
   }
 }
