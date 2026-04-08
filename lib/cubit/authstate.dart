@@ -56,3 +56,10 @@ class ProfileError extends AuthState {
   @override
   List<Object?> get props => [message];
 }
+class BatchDetailLoaded extends AuthState {
+  final Map<String, dynamic> batch;
+  BatchDetailLoaded(this.batch);
+
+  @override
+  List<Object?> get props => [batch];
+}

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'cubit/authcubit.dart';
 import 'cubit/themecubit.dart';
+import 'executt/batchdetail.dart';
 import 'executt/begin.dart';
 import 'executt/editeprofilvit.dart';
 import 'executt/fileinfo.dart';
+import 'executt/setupconsumer.dart';
 import 'executt/setupvit.dart';
 import 'executt/wether.dart';
 
@@ -72,7 +74,8 @@ class MyApp extends StatelessWidget {
             ),
             dividerTheme: const DividerThemeData(color: Colors.white12),
           ),
-          home: const EditProfilevitPage(token: '')
+          home: const BatchDetailPage(token: 'fake-token-123', batchId: "batch-001")
+          // EditProfilevitPage(token: '')
         );
       },
     );

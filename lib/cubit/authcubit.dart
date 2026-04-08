@@ -544,4 +544,94 @@ Future<void> fetchvitProfile(String token) async {
       emit(ProfileError(e.toString()));
     }
   }
+  //Fill information of Consumer
+  Future<void> submitSetupCons({
+    required String token,
+    required String fullNameCons,
+    required String nationalIdCons,
+    required String phoneCons,
+    required String emailCons,
+    required String delevryAddress,
+    required String nearbyPortCons,
+  }) async {
+    try {
+      emit(SetupLoading());
+
+      var request = http.MultipartRequest('POST', Uri.parse("$_baseUrl/api/complete-setup"));
+      request.headers.addAll({
+        "Authorization": "Bearer $token",
+        "Content-Type": "multipart/form-data",
+      });
+
+      request.fields['fullNameCons'] = fullNameCons;
+      request.fields['nationalIdCons'] = nationalIdCons;
+      request.fields['phoneCons'] = phoneCons;
+      request.fields['emailCons'] = emailCons;
+      request.fields['delevryAddress'] = delevryAddress;
+      request.fields['nearbyPort'] = nearbyPortCons;
+
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        emit(SetupSuccess());
+      } else {
+        emit(AuthError("Setup failed: ${response.body}"));
+      }
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+  // Future<void> fetchBatchById(String token, String batchId) async {
+  //   try {
+  //     emit(AuthLoading());
+  //     final response = await http.get(
+  //       Uri.parse("$_baseUrl/batch/mybatch/$batchId"),
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "Authorization": "Bearer $token",
+  //         "ngrok-skip-browser-warning": "true",
+  //       },
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       final data = jsonDecode(response.body);
+  //       emit(BatchDetailLoaded(data));
+  //     } else {
+  //       emit(AuthError("Failed to load batch: ${response.body}"));
+  //     }
+  //   } catch (e) {
+  //     emit(AuthError(e.toString()));
+  //   }
+  // }
+  Future<void> fetchBatchById(String token, String batchId) async {
+    try {
+      emit(AuthLoading());
+
+      // ← Simulation délai réseau
+      await Future.delayed(const Duration(seconds: 1));
+
+      // ← Données simulées (comme si le backend les envoyait)
+      final Map<String, dynamic> fakeBatch = {
+        "name": "Sea Bream",
+        "category": "Marine Fish",
+        "price": 2450.00,
+        "weight": 12.5,
+        "arrival": "Mar 31, 2026 3:12 PM",
+        "freshnessScore": 85,
+        "shelfLife": "14 H Left",
+        "deliveryAddress": "Rue El wiam, Sidi Bel Abbes",
+        "photos": [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Biharwe_market_fish.jpg/800px-Biharwe_market_fish.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Camponotus_flavomarginatus_ant.jpg/640px-Camponotus_flavomarginatus_ant.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png",
+        ],
+      };
+
+      emit(BatchDetailLoaded(fakeBatch));
+
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
 }
