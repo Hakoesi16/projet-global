@@ -634,4 +634,31 @@ Future<void> fetchvitProfile(String token) async {
       emit(AuthError(e.toString()));
     }
   }
+  Future<void> updatePassword({
+    required String token,
+    required String password,
+  }) async {
+    try {
+      emit(AuthLoading());
+      final response = await http.put(
+        Uri.parse("$_baseUrl/auth/update-profile"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+          "ngrok-skip-browser-warning": "true",
+        },
+        body: jsonEncode({
+          "passwors": password,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        emit(PasswordUpdatedSuccess());
+      } else {
+        emit(ProfileError("Update failed"));
+      }
+    } catch (e) {
+      emit(ProfileError(e.toString()));
+    }
+  }
 }

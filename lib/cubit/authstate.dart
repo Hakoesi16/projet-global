@@ -63,3 +63,8 @@ class BatchDetailLoaded extends AuthState {
   @override
   List<Object?> get props => [batch];
 }
+class PasswordLoaded extends AuthState {
+  final Map<String, dynamic> user;
+  PasswordLoaded(this.user);
+}
+class PasswordUpdatedSuccess extends AuthState {}
