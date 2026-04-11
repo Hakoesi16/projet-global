@@ -39,14 +39,22 @@ class HomeDataLoaded extends AuthState {
   List<Object?> get props => [data];
 }
 
-class InspectionDataLoaded extends AuthState { // Nouvel état pour Vet Inspection
+class InspectionDataLoaded extends AuthState {
   final Map<String, dynamic> data;
   InspectionDataLoaded(this.data);
   @override
   List<Object?> get props => [data];
 }
 
+class BatchDetailLoaded extends AuthState { // État ajouté ici
+  final Map<String, dynamic> data;
+  BatchDetailLoaded(this.data);
+  @override
+  List<Object?> get props => [data];
+}
+
 class ProfileUpdatedSuccess extends AuthState {}
+class PasswordUpdatedSuccess extends AuthState {}
 class SetupLoading extends AuthState {}
 class SetupSuccess extends AuthState {}
 
@@ -56,15 +64,3 @@ class ProfileError extends AuthState {
   @override
   List<Object?> get props => [message];
 }
-class BatchDetailLoaded extends AuthState {
-  final Map<String, dynamic> batch;
-  BatchDetailLoaded(this.batch);
-
-  @override
-  List<Object?> get props => [batch];
-}
-class PasswordLoaded extends AuthState {
-  final Map<String, dynamic> user;
-  PasswordLoaded(this.user);
-}
-class PasswordUpdatedSuccess extends AuthState {}

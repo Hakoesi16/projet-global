@@ -292,7 +292,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: isDark ? BorderSide.none : const BorderSide(color: Color(0xFFE2E8F0)),
+              borderSide: isDark ? BorderSide.none : const Color(0xFFE2E8F0) != null ? const BorderSide(color: Color(0xFFE2E8F0)) : BorderSide.none,
             ),
           ),
         ),

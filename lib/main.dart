@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:send/executt/changepassword.dart';
 import 'cubit/authcubit.dart';
 import 'cubit/themecubit.dart';
 import 'executt/batchdetail.dart';
@@ -74,7 +75,8 @@ class MyApp extends StatelessWidget {
             ),
             dividerTheme: const DividerThemeData(color: Colors.white12),
           ),
-          home: const BatchDetailPage(token: 'fake-token-123', batchId: "batch-001")
+          home: const ProfilePage( token: '')
+          // BatchDetailPage(token: 'fake-token-123', batchId: "batch-001")
           // EditProfilevitPage(token: '')
         );
       },

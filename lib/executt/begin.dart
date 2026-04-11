@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/authcubit.dart';
 import '../cubit/authstate.dart';
 import '../cubit/themecubit.dart';
+import 'changepassword.dart';
 import 'editeprofile.dart';
 import 'homepage.dart';
 
@@ -215,7 +216,12 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       child: Column(
         children: [
-          _settingsTile(Icons.lock_outline, "Change Password", isDark, trailing: const Icon(Icons.chevron_right, color: Colors.grey)),
+          _settingsTile(Icons.lock_outline, "Change Password", isDark,
+          trailing:
+          IconButton(onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ChangepasswordPage(token: widget.token)));
+          },icon:  const Icon(Icons.chevron_right, color: Colors.grey,
+      ))),
           const Divider(height: 1),
           _settingsTile(Icons.notifications_none, "Notifications", isDark,
               trailing: Switch(
