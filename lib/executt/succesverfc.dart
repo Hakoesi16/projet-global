@@ -26,7 +26,8 @@ class _VetInspectionPageState extends State<VetInspectionPage> {
   }
 
   Future<void> _downloadCertificate(String? url) async {
-    final Uri uri = Uri.parse(url ?? "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf");
+    final Uri uri = Uri.parse(url ?? "https://www.orimi.com/pdf-test.pdf");
+    // "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

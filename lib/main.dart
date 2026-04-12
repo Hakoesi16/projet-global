@@ -9,6 +9,7 @@ import 'executt/editeprofilvit.dart';
 import 'executt/fileinfo.dart';
 import 'executt/setupconsumer.dart';
 import 'executt/setupvit.dart';
+import 'executt/succesverfc.dart';
 import 'executt/wether.dart';
 
 void main() {
@@ -75,7 +76,8 @@ class MyApp extends StatelessWidget {
             ),
             dividerTheme: const DividerThemeData(color: Colors.white12),
           ),
-          home: const ProfilePage( token: '')
+          home: const VetInspectionPage(batchId: '', token: '',)
+          // ProfilePage( token: '')
           // BatchDetailPage(token: 'fake-token-123', batchId: "batch-001")
           // EditProfilevitPage(token: '')
         );
